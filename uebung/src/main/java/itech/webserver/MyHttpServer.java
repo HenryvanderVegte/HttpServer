@@ -19,6 +19,9 @@ import itech.util.ToDoList;;
 public class MyHttpServer {
 	
 	Map<String, ToDoList> clientToDoLists;
+	private static final String admin_user = "root";
+	private static final String admin_password = "123456";
+
 
     public MyHttpServer(int port, final File fileRoot){
     	clientToDoLists = new HashMap<>();
@@ -70,5 +73,11 @@ public class MyHttpServer {
     		clientToDoLists.put(clientIP, newlist);
     		return newlist;
     	}
+    }
+
+    public boolean isAuthorizedUser(String username, String password){
+        if(username.equals(admin_user) && password.equals(admin_password))
+            return true;
+        return false;
     }
 }

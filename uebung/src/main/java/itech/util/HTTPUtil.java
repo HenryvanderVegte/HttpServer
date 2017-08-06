@@ -8,7 +8,9 @@ public class HTTPUtil {
 	
 	private static final String addToListLink = "/addtolist.html";
 	private static final String addToListItem = "listitem=";
-	
+	private static final String usernameTAG = "username=";
+	private static final String passwordTAG = "password=";
+
 
     private static HashMap<String, String> mimeTypes = new HashMap<>();
     private static boolean mimeTypesInitCompleted = false;
@@ -22,7 +24,19 @@ public class HTTPUtil {
 		
 		return item;
 	}
-	
+
+	public static String parseUsername(String body){
+		String user = body.split("&")[0];
+		user = user.substring(usernameTAG.length(), user.length());
+		return user;
+	}
+
+	public static String parsePassword(String body){
+		String password = body.split("&")[1];
+		password = password.substring(passwordTAG.length(), password.length());
+		return password;
+	}
+
 	public static String getToDoItemFromBody(String body){
 		if(!body.startsWith(addToListItem)){
 			return null;

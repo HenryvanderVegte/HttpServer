@@ -163,12 +163,13 @@ public class HttpThread extends Thread {
      * @throws FileNotFoundException
      */
     private void processPOSTRequest() throws IOException, FileNotFoundException{
-    	System.out.println("Got post request:");
-    	System.out.println("Body: " + requestBody);
+
 
     	String wantedFile = requestHeader.get(0).substring(5, requestHeader.get(0).length() - 9);
     	String path = wantedFile;
-    	
+
+        System.out.println("Got post request:" + path);
+        System.out.println("Body: " + requestBody);
     	if(path.startsWith("/addtolist.html")){
         	String toDoItem = HTTPUtil.getToDoItemFromBody(requestBody);
         	System.out.println(toDoItem);
@@ -179,6 +180,16 @@ public class HttpThread extends Thread {
         		path = "/todoadd_fail.html";
         	}
         	
+        } else if(path.startsWith("/login")){
+            String username = HTTPUtil.parseUsername(requestBody);
+            String password = HTTPUtil.parsePassword(requestBody);
+            System.out.println(username + "   " +password);
+            boolean loginSucceed = httpServer.isAuthorizedUser(username, password);
+            if(loginSucceed){
+                System.out.println("Login succeed!");
+            } else {
+                System.out.println("Login failed!");
+            }
         } else if (wantedFile.contains("?")) {
             path = wantedFile.substring(0, wantedFile.indexOf("?"));
         } else {
