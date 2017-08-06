@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+	<head></head>
+	<style type="text/css">
+		html{
+			background:darkgrey;
+			height:100%;
+			margin:0;
+			padding:0;
+		}
+		body{
+			background: #eee;
+			height:100%;
+			margin:0;
+			padding:0;
+			position: fixed;
+			top:0;
+		}
+		div>*{
+			margin:10px;
+		}
+		button{
+			padding:6px;
+			font-size:12pt;
+		}
+		#contButton{
+			color:white;
+		}
+	</style>
+	<body style="width:80%;margin-left:10%">
+		<h1 style="text-align:center">Digital Scatching Space</h1>
+		<div style="text-align:right;float:left;width:50%;">
+			
+			<canvas id="thisCanvas" width="300" height="300" style="position:absolute;opacity: 1;border: 5px ridge darkblue" ></canvas>
+			<canvas id="thisCanvas2" width="300" height="300" style="background:url('net.png');border: 5px ridge darkblue" ></canvas>
+			<div>
+			<button id="clearButton">clear</button>
+			<button id="contButton">continuous mode</button>
+			</div>
+		</div>
+		<div style="position:relative;float:left;width:50%;height: 100px" >
+			<div id="anmelden" style="height:100%">
+				<form method="post" action="/sendJson">
+				<div style="float:left; width:50%">
+					<label for="user">Username</label>
+					<input id="user" name="username" type="text" value="xy"/><br/>
+					<label for="pass">Password</label>
+					<input id="pass" type="password" value="z" name="password"><br/>
+					</div>
+                    <input id="lines" name="lines" value=""/>
+					<div style="float:left; width:50%">
+					<button type="submit" onclick="showJsons()" >login</button>
+					</div>
+				</form>
+			</div>
+			</br>
+			</br>
+			<div style="float:left">
+			<p>Startpunkt:<span id="startP">x</span></p>
+			<p>Endpunkt:<span id="endP">x</span></p>	
+			<h3>aktuelle Linien</h3>
+			<ul id="Linien">
+
+			</ul>
+			</div>
+		</div>
+	
+		<script type="text/javascript">	
+			var c = document.getElementById("thisCanvas");
+			var c2 = document.getElementById("thisCanvas2");
+			var ctx = c.getContext('2d');
+			var ctx2 = c2.getContext('2d');
+			var button = document.getElementById("clearButton");
+			var button2 = document.getElementById("contButton");
+			var cont = false;
+			var backgroundColor = button2.style.background;
+			
+
+			var startPoint = [0,0];
+			var endPoint = [0,0];
+			button.addEventListener('click',function(){
+				clear(ctx);
+				clear(ctx2);
+				document.getElementById('Linien').innerHTML='';
+				firstClick = true;
+			},false);
+			button2.addEventListener('click',function(){
+				switchContMode();
+			},false);
+		
+
+			function switchContMode(){
+				if(!cont){
+				button2.style ="background-color:green";
+				cont = true;
+				}else{
+				button2.style.background = backgroundColor;
+				cont = false;
+				}
+			}
+			 function getMousePos(canvas, evt) {
+		        var rect = canvas.getBoundingClientRect();
+		        return {
+		          x: Math.round(evt.clientX - rect.left -5),
+		          y: Math.round(evt.clientY - rect.top-5)
+		        };
+		      }
+		      function clear(context){
+		      	context.clearRect(0, 0, 300, 300);
+		      	context.beginPath();
+
+	      		
+		      }
+				document.body.onkeyup = function(e){
+				    if(e.keyCode == 32){
+				        switchContMode();
+				    }
+				}
+		      firstClick = true;
+		      lineDone = false;
+		      var lastClickX = 0;
+		      var lastClickY = 0;
+		       c.addEventListener('click', function(evt) {
+		        var mousePos = getMousePos(c, evt);
+		        lastClickX = mousePos.x;
+		        lastClickY= mousePos.y;
+		      
+		        // writeMessage(c, message);
+		        if(!cont){
+		        if(firstClick){
+		        	startPoint[0]= mousePos.x;
+		        	startPoint[1]= mousePos.y;
+					ctx.moveTo(mousePos.x,mousePos.y);
+					ctx2.moveTo(mousePos.x,mousePos.y);
+					firstClick = false;
+					
+		        }else{
+					ctx2.lineTo(mousePos.x,mousePos.y);
+					clear(ctx);
+					ctx2.stroke();
+					// ctx.moveTo(endPoint[0],endPoint[1]);
+					makeJsonString();
+					firstClick = true;
+		        }	
+		        }else{
+		        	if(firstClick){
+		        		ctx.moveTo(mousePos.x,mousePos.y);
+		        		ctx2.moveTo(mousePos.x,mousePos.y);
+		        		firstClick = false;
+			        }else{
+			        	ctx2.lineTo(mousePos.x,mousePos.y);
+			        	ctx2.stroke();
+
+			        }
+		        }	
+		      
+		      }, false);
+
+		       c.addEventListener("mousemove",function(evt){
+				var mousePos = getMousePos(c, evt);
+				document.getElementById("startP").innerHTML ="("+startPoint[0]+","+ startPoint[1]+")";
+				document.getElementById("endP").innerHTML ="("+endPoint[0]+","+ endPoint[1]+")";
+				if(!firstClick){
+					clear(ctx);
+					endPoint[0]= mousePos.x;
+		        	endPoint[1]= mousePos.y;
+					ctx.moveTo(lastClickX,lastClickY);
+					ctx.lineTo(mousePos.x,mousePos.y);
+					ctx.stroke();
+
+
+				}else if(!lineDone){
+					startPoint[0]= mousePos.x;
+		        	startPoint[1]= mousePos.y;
+		        	
+				}
+		       },false);
+
+				var JsonStringArr = [];
+		       var j = 0;
+		       function makeJsonStringWith( xCoorA,  yCoorA,  xCoorB,  yCoorB){
+					var JsonString = "";
+					JsonString ="{'xCoorA':"+xCoorA+",'yCoorA':"+yCoorA+",'xCoorB':"+xCoorB+",'yCoorB':"+yCoorB+"}";
+		       		document.getElementById('Linien').innerHTML+='<li>'+JsonString+'</li>';
+		       		JsonStringArr[j] = JsonString;
+		       		j++;
+		       }
+
+		       	function makeJsonString(){
+					makeJsonStringWith(startPoint[0],startPoint[1],endPoint[0],endPoint[1]);
+				}
+
+				function showJsons(){
+					var output = "";
+					for(var k = 0;k< JsonStringArr.length;k++){
+						output += JsonStringArr[k]+"\n";
+					}
+					document.getElementById('lines').value = output;
+					<!--return output;-->
+					<!--alert(output);-->
+				}
+		</script>
+	</body>
+</html>
