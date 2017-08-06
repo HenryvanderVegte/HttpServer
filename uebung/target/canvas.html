@@ -40,7 +40,7 @@
 		</div>
 		<div style="position:relative;float:left;width:50%;height: 100px" >
 			<div id="anmelden" style="height:100%">
-				<form method="post" action="/sendJson">
+
 				<div style="float:left; width:50%">
 					<label for="user">Username</label>
 					<input id="user" name="username" type="text" value="xy"/><br/>
@@ -49,9 +49,9 @@
 					</div>
                     <input id="lines" name="lines" value=""/>
 					<div style="float:left; width:50%">
-					<button type="submit" onclick="showJsons()" >login</button>
+					<button type="submit" onclick="login()" >login</button>
 					</div>
-				</form>
+
 			</div>
 			</br>
 			</br>
@@ -190,14 +190,25 @@
 					makeJsonStringWith(startPoint[0],startPoint[1],endPoint[0],endPoint[1]);
 				}
 
-				function showJsons(){
-					var output = "";
-					for(var k = 0;k< JsonStringArr.length;k++){
-						output += JsonStringArr[k]+"\n";
+				function login(){
+
+					var http = new XMLHttpRequest();
+					var url = "/login";
+					var username = document.getElementById("user").value;
+					var password = document.getElementById("pass").value;
+
+					var params = "username=" + username + "&password=" + password;
+					http.open("POST", url, true);
+
+					//Send the proper header information along with the request
+					http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4 && http.status == 200) {
+							alert(http.responseText);
+						}
 					}
-					document.getElementById('lines').value = output;
-					<!--return output;-->
-					<!--alert(output);-->
+					http.send(params);
 				}
 		</script>
 	</body>
