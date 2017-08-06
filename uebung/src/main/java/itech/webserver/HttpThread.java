@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import itech.json.JsonSerialize;
 import itech.util.HTTPUtil;
 import itech.util.ToDoList;
 
@@ -173,23 +174,29 @@ public class HttpThread extends Thread {
     	if(path.startsWith("/addtolist.html")){
         	String toDoItem = HTTPUtil.getToDoItemFromBody(requestBody);
         	System.out.println(toDoItem);
+
         	if(toDoItem != null && !toDoItem.equals("")){
         		httpServer.putItemToToDoList(clientIP, toDoItem);
         		path = "/todoadd_success.html";
         	} else {
         		path = "/todoadd_fail.html";
         	}
-        	
+
         } else if(path.startsWith("/login")){
             String username = HTTPUtil.parseUsername(requestBody);
             String password = HTTPUtil.parsePassword(requestBody);
             System.out.println(username + "   " +password);
             boolean loginSucceed = httpServer.isAuthorizedUser(username, password);
+            JsonSerialize jsonObj = new JsonSerialize();
             if(loginSucceed){
                 System.out.println("Login succeed!");
+                jsonObj.addString("success","true");
             } else {
                 System.out.println("Login failed!");
+                jsonObj.addString("success","false");
             }
+            sendStringMessage(out, jsonObj.getString());
+            return;
         } else if (wantedFile.contains("?")) {
             path = wantedFile.substring(0, wantedFile.indexOf("?"));
         } else {
