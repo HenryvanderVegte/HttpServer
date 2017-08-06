@@ -11,14 +11,17 @@
         var button2 = document.getElementById("contButton");
         var cont = false;
         var backgroundColor = button2.style.background;
-
+            var JsonStringArr = [];
 
         var startPoint = [0,0];
         var endPoint = [0,0];
+
         button.addEventListener('click',function(){
             clear(ctx);
             clear(ctx2);
+
             document.getElementById('Linien').innerHTML='';
+            JsonStringArr = [];
             firstClick = true;
         },false);
         button2.addEventListener('click',function(){
@@ -113,11 +116,11 @@
             }
            },false);
 
-            var JsonStringArr = [];
+
            var j = 0;
            function makeJsonStringWith( xCoorA,  yCoorA,  xCoorB,  yCoorB){
                 var JsonString = "";
-                JsonString ="{'xCoorA':"+xCoorA+",'yCoorA':"+yCoorA+",'xCoorB':"+xCoorB+",'yCoorB':"+yCoorB+"}";
+                JsonString ="{ \"x1\": "+xCoorA+", \"y1\": "+yCoorA+", \"x2\":"+xCoorB+", \"y2\": "+yCoorB+" }";
                 document.getElementById('Linien').innerHTML+='<li>'+JsonString+'</li>';
                 JsonStringArr[j] = JsonString;
                 j++;
@@ -154,4 +157,34 @@
                     }
                 }
                 http.send(params);
+            }
+
+            function saveLines(){
+                var jsonString = "{\n";
+                var arrayLength = JsonStringArr.length;
+                for (var i = 0; i < arrayLength; i++) {
+                     var currentName = "\"line" + i + "\": ";
+                     jsonString += currentName + JsonStringArr[i] +",";
+                     jsonString += "\n";
+                 }
+                jsonString += "}";
+
+                var http = new XMLHttpRequest();
+                var url = "/canvas_save";
+                http.open("POST", url, true);
+                http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                http.onreadystatechange = function() {//Call a function when the state changes.
+                                    if(http.readyState == 4 && http.status == 200) {
+                                         var response = http.responseText;
+                                         response = response.replace(/(\r\n|\n|\r)/gm,"");
+                                         var successText = "{\"success\": \"true\",}";
+                                         if(response === successText){
+                                              alert("Linien gespeichert!");
+                                         } else {
+                                             alert("Speichern fehlgeschlagen!");
+                                         }
+                                    }
+                                }
+                http.send(jsonString);
             }

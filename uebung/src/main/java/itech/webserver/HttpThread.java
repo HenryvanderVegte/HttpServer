@@ -197,6 +197,20 @@ public class HttpThread extends Thread {
             }
             sendStringMessage(out, jsonObj.getString());
             return;
+        } else if(path.startsWith("/canvas_save")){
+            String jsonString = requestBody;
+            JsonSerialize jsonObject = new JsonSerialize();
+            jsonObject.parseString(jsonString);
+            JsonSerialize jsonAnswer = new JsonSerialize();
+            if(jsonObject.getObjects() != null && jsonObject.getObjects().size() != 0){
+                httpServer.savedJSONObjects = jsonObject;
+                jsonAnswer.addString("success","true");
+                System.out.println("Saved JSON Objects: " + jsonObject.getString());
+            } else {
+                jsonAnswer.addString("success","false");
+            }
+            sendStringMessage(out, jsonAnswer.getString());
+            return;
         } else if (wantedFile.contains("?")) {
             path = wantedFile.substring(0, wantedFile.indexOf("?"));
         } else {

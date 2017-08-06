@@ -11,6 +11,7 @@ import java.util.Map;
 
 import com.sun.net.httpserver.*;
 
+import itech.json.JsonSerialize;
 import itech.util.ToDoList;;
 
 /**
@@ -19,6 +20,7 @@ import itech.util.ToDoList;;
 public class MyHttpServer {
 	
 	Map<String, ToDoList> clientToDoLists;
+	JsonSerialize savedJSONObjects;
 	private static final String admin_user = "root";
 	private static final String admin_password = "123456";
 

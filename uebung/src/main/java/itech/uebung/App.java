@@ -19,7 +19,7 @@ public class App
 {
     public static void main( String[] args )
     {
-    	/*
+        /*
     	JsonSerialize jsonSerialize = new JsonSerialize();
     	jsonSerialize.addInteger("hausnummer", 14);
     	jsonSerialize.addString("name", "mueller");
@@ -40,7 +40,8 @@ public class App
     	jsonSerialize.parseString(JSONString);
     	
     	System.out.println(jsonSerialize.getString());
-    	*/
+
+        */
     	Path targetPath = Paths.get("target");
         MyHttpServer httpServer = new MyHttpServer(8888, targetPath.toFile());
 
